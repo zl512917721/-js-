@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Document</title>
+    <style type="text/css">
+        .btn{
+            padding: 6px 12px;
+            border-radius: 4px;
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            overflow:hidden;
+            box-sizing: border-box;
+            border: 1px solid ;
+        }
+        .btn:focus{
+            outline: none;
+        }
+        .btn-default{
+            color: #666;
+            background: #e4e4e4;
+            border-color: #e4e4e4;
+        }
+        .btn-border{
+            background: #fff;
+            color: #666;
+        }
+        .btn-border:hover{
+            color: #333;
+        }
+        .btn-default:hover{
+            background: #c7c7c7;
+            border-color: #c7c7c7;
+        }
+        .btn-primary{
+            background: #5389d2;
+            border-color: #5389d2;
+        }
+        .btn-primary:hover{
+            background: #3d77c7;
+            border-color: #3d77c7;
+        }
+        .halo{
+            width: 0px;
+            height: 0px;
+            background: rgba(0,0,0,0.3);
+            position: absolute;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <button class="btn btn-primary">test</button>
+    <button class="btn btn-border">test2</button>
+    <button class="btn btn-default">test3</button>
+    <script type="text/javascript">
+        window.onload = function(){
+            var btns = document.getElementsByClassName('btn');
+            for(var i =0; i<btns.length;i++){
+                btns[i].addEventListener('click',btnClickEffect);
+            }
+            
+            function btnClickEffect (e){
+                //防止按钮被连续点击
+                this.setAttribute('disabled','disabled');
+                var e = e || window.event;
+
+                //获取光标在元素内的坐标
+                var target = e.target || e.srcElement,
+                    style = target.currentStyle || window.getComputedStyle(target, null),
+                    borderLeftWidth = parseInt(style['borderLeftWidth'], 10),
+                    borderTopWidth = parseInt(style['borderTopWidth'], 10),
+                    rect = target.getBoundingClientRect(),
+                    offsetX = e.clientX - borderLeftWidth - rect.left,
+                    offsetY = e.clientY - borderTopWidth - rect.top,
+                    halo = document.createElement('span');
+
+                // 设置成百分比数值
+                offsetX = parseInt(offsetX/this.offsetWidth * 100);
+                offsetY = parseInt(offsetY/this.offsetHeight * 100);
+
+                console.log(offsetX,offsetY)
+                //创建蒙层，位置为鼠标在元素内的坐标
+                halo.setAttribute('class','halo');
+                halo.style.left = offsetX + '%';
+                halo.style.top = offsetY + '%';
+                this.appendChild(halo);
+                
+                //初始化元素运动的速度
+                var haloWidth = 0,locationSpeed = 0;
+               
+                //获取元素的宽高比
+                var scale = (this.offsetWidth/this.offsetHeight).toFixed(2);
+                console.log(scale);
+
+                // 让蒙层运动起来
+                var haloChange = setInterval(function(){
+               
+                    haloWidth += 16;
+                    locationSpeed += 8;
+              
+                    halo.style.width = haloWidth + '%';
+                    halo.style.height = scale*haloWidth + '%';
+                    halo.style.left = offsetX - locationSpeed +'%';
+                    halo.style.top = offsetY - scale*locationSpeed +'%';
+                },15)
+
+                var that = this;
+
+                // 一定时间后移除蒙层元素
+                setTimeout(function(){
+                    clearInterval(haloChange);
+                    that.removeChild(halo);
+                    that.removeAttribute('disabled');
+                },250)
+                
+            }
+        }
+       
+    </script>
+</body>
+</html>
